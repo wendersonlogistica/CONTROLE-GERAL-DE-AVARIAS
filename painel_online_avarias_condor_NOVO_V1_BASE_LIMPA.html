@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Controle Geral de Avaria - Condor | Novo V1 Base Limpa</title>
+<style>
+:root{
+  --azul:#24366f;
+  --azul2:#1b2854;
+  --laranja:#f26522;
+  --bg:#081120;
+  --painel:#101a2b;
+  --painel2:#0d1626;
+  --linha:#17243a;
+  --borda:#31425e;
+  --texto:#f8fafc;
+  --muted:#a9b6cb;
+  --ok:#22c55e;
+  --erro:#ef4444;
+  --aviso:#f59e0b;
+  --white:#fff;
+  --shadow:0 16px 50px rgba(0,0,0,.34);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--texto);font-family:Segoe UI,Arial,sans-serif;font-size:12px;overflow-x:hidden}
+button,input,select,textarea{font-family:inherit}
+button{border:0;border-radius:9px;padding:10px 13px;font-weight:900;cursor:pointer;min-height:34px;color:#fff;background:var(--azul);box-shadow:none}
+button:hover{filter:brightness(1.08)}
+button:disabled{opacity:.55;cursor:not-allowed;filter:grayscale(.2)}
+.btn-orange{background:var(--laranja)}
+.btn-blue{background:var(--azul)}
+.btn-light{background:#10213a;color:#b9d3ff;border:1px solid var(--borda)}
+.btn-danger{background:#fee2e2;color:#991b1b}
+.btn-small{min-height:24px;padding:4px 7px;font-size:10px;border-radius:6px}
+header{height:86px;background:#fff;color:#17316f;display:flex;align-items:center;justify-content:center;position:relative;border-bottom:5px solid var(--laranja)}
+.logoBox{position:absolute;left:42px;top:9px;width:110px;height:66px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.logoText{font-weight:1000;color:#17316f;font-size:27px;letter-spacing:-1px;line-height:.9;text-align:center}
+.logoText small{display:block;color:var(--laranja);font-size:7px;letter-spacing:.4px;margin-top:2px;text-transform:uppercase}
+header h1{margin:0;font-size:25px;font-weight:1000;letter-spacing:1px;text-transform:uppercase;color:#17316f}
+.container{width:calc(100vw - 32px);max-width:1840px;margin:12px auto 20px}
+.toolbar{background:var(--painel2);border:1px solid var(--borda);border-left:6px solid var(--laranja);border-radius:12px;padding:11px 12px;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;box-shadow:var(--shadow)}
+.toolbar .left,.toolbar .right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.loginStatus{font-weight:1000;color:#4ade80;font-size:12px;margin-left:4px}
+.status{margin:10px 0;background:#fff7ed;color:#7c2d12;border-left:6px solid var(--laranja);border-radius:9px;padding:10px 12px;font-weight:900;min-height:38px;display:flex;align-items:center}
+.periodo{background:var(--painel2);border:1px solid var(--borda);border-left:6px solid var(--laranja);border-radius:10px;padding:10px 12px;margin-bottom:10px;display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.periodo label{font-weight:1000;display:flex;align-items:center;gap:7px;white-space:nowrap}
+input,select,textarea{background:#0b1424;color:var(--texto);border:1px solid var(--borda);border-radius:8px;padding:8px 9px;min-height:32px;outline:none;font-weight:700}
+input:focus,select:focus,textarea:focus{border-color:var(--laranja);box-shadow:0 0 0 2px rgba(242,101,34,.18)}
+.cards{display:grid;grid-template-columns:repeat(9,minmax(135px,1fr));gap:8px;margin:10px 0 13px}
+.card{background:var(--painel);border:1px solid var(--borda);border-bottom:3px solid var(--laranja);border-radius:9px;padding:8px 10px;min-height:62px;cursor:pointer;transition:.15s}
+.card:hover{transform:translateY(-1px);border-color:#5f7aa8}
+.card.ativo{background:#2a3e7e;border-color:#7da0db}
+.card .nome{font-size:13px;font-weight:1000;color:#b9d3ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .valor{font-size:12px;font-weight:1000;margin-top:4px;color:#fff}
+.card .meta{font-size:10px;font-weight:900;color:#fff;margin-top:1px}
+.gridMain{display:grid;grid-template-columns:1fr;gap:12px}
+.digitacao{background:var(--painel2);border:1px solid var(--borda);border-left:6px solid var(--laranja);border-radius:13px;padding:0;box-shadow:var(--shadow);overflow:hidden;display:none}
+.digitacao.open{display:block}
+.digHead{background:var(--azul);border-bottom:3px solid var(--laranja);padding:9px 12px;display:flex;align-items:center;justify-content:space-between}
+.digHead h2{margin:0;font-size:15px;text-transform:uppercase;font-weight:1000}
+.formGrid{padding:12px;display:grid;grid-template-columns:repeat(16,minmax(60px,1fr));gap:8px;align-items:end}
+.field{display:flex;flex-direction:column;gap:3px;min-width:0}
+.field label{font-size:9px;font-weight:1000;text-transform:uppercase;color:#dbeafe;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c1{grid-column:span 1}.c2{grid-column:span 2}.c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c8{grid-column:span 8}.c16{grid-column:span 16}
+.destinos{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.destinoCheck{border:1px solid var(--borda);border-radius:8px;background:#0b1424;padding:8px;display:flex;gap:8px;align-items:center;justify-content:center;font-weight:1000;font-size:10px;white-space:nowrap;cursor:pointer}
+.destinoCheck input{min-height:auto;width:16px;height:16px;accent-color:var(--laranja)}
+.destinoCheck:has(input:checked){background:#172b51;border-color:var(--laranja);color:#fff}
+.acaoForm{display:flex;gap:8px;align-items:center}
+.listaBox{margin:0 12px 12px;border:2px solid var(--laranja);border-radius:11px;overflow:hidden;background:#0b1424}
+.listaHead{background:#0f1c31;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:2px solid var(--laranja)}
+.listaHead strong{font-size:14px;text-transform:uppercase}
+.listaBody{min-height:64px;overflow:auto;max-height:230px}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th,td{border:1px solid var(--borda);padding:7px 7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+th{background:var(--azul);color:#fff;font-size:10px;text-transform:uppercase;position:sticky;top:0;z-index:3}
+td{background:#0f1829;color:#fff;font-size:11px}
+.center{text-align:center}.num{text-align:right}.left{text-align:left}
+.empty{padding:25px;text-align:center;color:var(--muted);font-weight:1000}
+.tableWrap{background:var(--painel2);border:1px solid var(--borda);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.tableTitle{padding:10px 12px;font-size:14px;font-weight:1000;text-transform:uppercase;background:#070f1d;color:#fff;border-bottom:1px solid var(--borda)}
+.tableScroll{max-height:calc(100vh - 415px);min-height:250px;overflow:auto}
+.menuAdmin{position:relative}
+.menuDrop{display:none;position:absolute;top:40px;left:0;width:245px;background:#fff;color:#111827;border:1px solid #bfdbfe;border-radius:8px;box-shadow:0 12px 35px rgba(0,0,0,.35);padding:8px;z-index:1000}
+.menuAdmin.open .menuDrop{display:block}
+.menuDrop h4{margin:2px 4px 7px;font-size:11px;color:#374151;text-transform:uppercase}
+.menuDrop button{display:block;width:100%;text-align:left;margin:5px 0;background:#fff7ed;color:#7c2d12;border:1px solid #fed7aa;box-shadow:none}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.68);display:none;align-items:center;justify-content:center;z-index:9999;padding:18px}
+.modal.open{display:flex}
+.modalBox{width:min(430px,96vw);background:#fff;color:#111827;border-radius:13px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.modalHead{background:var(--azul);color:#fff;border-bottom:4px solid var(--laranja);padding:14px 16px;font-weight:1000;font-size:15px}
+.modalBody{padding:16px;display:flex;flex-direction:column;gap:9px}
+.modalBody label{font-weight:1000;color:#334155;text-transform:uppercase;font-size:11px}
+.modalBody input{background:#fff;color:#111827;border:1px solid #94a3b8}
+.modalActions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+.toastErro{color:#991b1b;font-weight:900;display:none}
+body.temaClaro{background:#f1f5f9;color:#111827}
+body.temaClaro .toolbar,body.temaClaro .periodo,body.temaClaro .digitacao,body.temaClaro .tableWrap{background:#fff;color:#111827}
+body.temaClaro td{background:#fff;color:#111827}
+body.temaClaro input,body.temaClaro select,body.temaClaro textarea{background:#fff;color:#111827}
+@media(max-width:1400px){.cards{grid-template-columns:repeat(5,1fr)}.formGrid{grid-template-columns:repeat(12,1fr)}.c4,.c5,.c6{grid-column:span 4}.c8{grid-column:span 6}.c16{grid-column:span 12}.destinos{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:900px){header h1{font-size:18px}.logoBox{display:none}.cards{grid-template-columns:repeat(2,1fr)}.formGrid{grid-template-columns:repeat(2,1fr)}.field,.c1,.c2,.c3,.c4,.c5,.c6,.c8,.c16{grid-column:span 2}.destinos{grid-template-columns:1fr}.toolbar{align-items:stretch}.toolbar .left,.toolbar .right{width:100%}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logoBox"><div class="logoText">condor<small>o atacado da construção</small></div></div>
+  <h1>Controle Geral de Avaria</h1>
+</header>
+
+<div class="container">
+  <section class="toolbar">
+    <div class="left">
+      <button class="btn-orange" id="btnToggleDigitacao">Exibir/Ocultar Digitação</button>
+      <button class="btn-blue" id="btnAtualizar">Atualizar base e lançamentos</button>
+      <button class="btn-light" id="btnTema">Claro/Escuro</button>
+      <div class="menuAdmin" id="menuAdmin">
+        <button class="btn-blue" id="btnAdmin">Administração ▾</button>
+        <div class="menuDrop">
+          <h4>Ferramentas administrativas</h4>
+          <button id="btnLimparCard">Limpar lançamentos do card</button>
+          <button id="btnExcluirPalete">Excluir Palete(s)</button>
+          <button id="btnDiagnosticar">Diagnosticar card</button>
+        </div>
+      </div>
+      <button class="btn-blue" id="btnGerarOrcamento" disabled title="Etapa 2">Gerar Orçamento</button>
+      <button class="btn-light" id="btnConsultarOrcamento" disabled title="Etapa 2">Consultar Orçamentos</button>
+    </div>
+    <div class="right">
+      <button class="btn-light" id="btnLogin">Login</button>
+      <span class="loginStatus" id="loginStatus">Não logado</span>
+    </div>
+  </section>
+
+  <div class="status" id="statusBase">Painel novo V1 pronto. Clique em Atualizar base e lançamentos.</div>
+
+  <section class="periodo">
+    <label>DATA INICIAL <input id="dataInicial" type="date"></label>
+    <label>DATA FINAL <input id="dataFinal" type="date"></label>
+    <button class="btn-light" id="btnLimparPeriodo">Limpar período</button>
+    <strong id="periodoResumo">Período: Todos</strong>
+  </section>
+
+  <section class="cards" id="cards"></section>
+
+  <section class="digitacao" id="painelDigitacao">
+    <div class="digHead"><h2>Digitar Avaria</h2><button class="btn-light" id="btnOcultarDigitacao">Ocultar</button></div>
+    <form id="formAvaria" autocomplete="off">
+      <div class="formGrid">
+        <div class="field c1"><label>Código</label><input id="codigo" inputmode="numeric"></div>
+        <div class="field c1"><label>&nbsp;</label><button type="button" class="btn-orange" id="btnBuscar">Buscar</button></div>
+        <div class="field c5"><label>Descrição</label><input id="descricao" readonly></div>
+        <div class="field c3"><label>Fornecedor</label><input id="fornecedor" readonly></div>
+        <div class="field c2"><label>Vlr Venda</label><input id="valorVenda" readonly></div>
+        <div class="field c2"><label>Custo Ult. Entrada</label><input id="custo" readonly></div>
+        <div class="field c2"><label>Qtd Total</label><input id="qtdTotal" type="number" min="0" step="1"></div>
+        <div class="field c2"><label>Qtd Lote Venda</label><input id="qtdLote" type="number" min="0" step="1"></div>
+        <div class="field c2"><label>Qtd Recuperado</label><input id="qtdRecup" type="number" min="0" step="1"></div>
+        <div class="field c2"><label>Qtd Lixo</label><input id="qtdLixo" type="number" min="0" step="1"></div>
+        <div class="field c2"><label>Vlr Perda</label><input id="vlrPerda" readonly></div>
+        <div class="field c4"><label>Endereço</label><input id="endereco" placeholder="Ex: 101-25-10-301"></div>
+        <div class="field c2"><label>Estado</label><select id="estado"><option>A</option><option>B</option><option>C</option></select></div>
+        <div class="field c2"><label>Desconto</label><select id="desconto"><option value="0.30">30%</option><option value="0.40">40%</option><option value="0.50">50%</option></select></div>
+        <div class="field c2"><label>Preço c/desconto</label><input id="precoAvaria" readonly></div>
+        <div class="field c2"><label>Valor Total</label><input id="valorTotal" readonly></div>
+        <div class="field c2"><label>Vlr Lote</label><input id="vlrLote" readonly></div>
+        <div class="field c2"><label>Vlr Recuperado</label><input id="vlrRecup" readonly></div>
+        <div class="field c2"><label>Vlr Lixo</label><input id="vlrLixo" readonly></div>
+        <div class="field c2"><label>Data Avaria</label><input id="data" type="date"></div>
+        <div class="field c2"><label>Turno</label><input id="turno" placeholder="DIURNO/REVERSA"></div>
+        <div class="field c2"><label>Palete</label><input id="palete"></div>
+        <div class="field c3"><label>Mot. Avaria</label><input id="motAvaria"></div>
+        <div class="field c3"><label>Motivo da Perda</label><input id="motPerda"></div>
+        <div class="field c3"><label>Validade</label><input id="validade" type="date"></div>
+        <div class="field c3"><label>Mot. Devolução</label><input id="motDevolucao"></div>
+        <div class="field c3"><label>Mot. Troca</label><input id="motTroca"></div>
+        <div class="field c4"><label>Observação</label><input id="observacao" placeholder="Observação opcional"></div>
+        <div class="field c16"><label>Destino / Card selecionado</label><div class="destinos" id="destinosForm"></div></div>
+        <div class="field c16"><div class="acaoForm"><button type="submit" class="btn-orange">Adicionar à lista</button><button type="button" class="btn-light" id="btnLimparForm">Limpar formulário</button></div></div>
+      </div>
+    </form>
+    <div class="listaBox">
+      <div class="listaHead"><strong id="tituloFila">Itens digitados / aguardando salvamento - 0 lançamento(s)</strong><div><button class="btn-blue" id="btnSalvarFila">Salvar lista no Google Sheets</button> <button class="btn-light" id="btnLimparFila">Limpar lista</button></div></div>
+      <div class="listaBody" id="bodyFila"><div class="empty">Nenhum lançamento na lista.</div></div>
+    </div>
+  </section>
+
+  <section class="tableWrap">
+    <div class="tableTitle" id="tableTitle">Selecione um card</div>
+    <div class="tableScroll">
+      <table id="mainTable">
+        <thead id="thead"></thead>
+        <tbody id="tbody"><tr><td class="empty">Selecione um card para visualizar os lançamentos.</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<div class="modal" id="modalLogin">
+  <div class="modalBox">
+    <div class="modalHead">Login obrigatório</div>
+    <div class="modalBody">
+      <label>Usuário</label><input id="loginUsuario">
+      <label>Senha</label><input id="loginSenha" type="password">
+      <div class="toastErro" id="loginErro">Usuário, senha ou acesso inválido.</div>
+      <div class="modalActions"><button class="btn-light" id="loginCancelar">Cancelar</button><button class="btn-orange" id="loginOk">Entrar</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+const APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbzPdCIRsQJDUTDrP8GNUVUY1f-IglYeC-HACSNLp9y2jmCDGHJUc-cYSdnW7m105M5u/exec';
+const DESTINOS=['LOTE DE AVARIA','RECUPERADO','BAIXA POR PERDA','VENCIDOS','DEV.FORNC','TROCA CLIENTE','DEB.MOTORISTA','DEMÉRITO','VALORES DIÁRIOS'];
+const DESTINOS_OPER=['LOTE DE AVARIA','RECUPERADO','BAIXA POR PERDA','VENCIDOS','DEV.FORNC','TROCA CLIENTE','DEB.MOTORISTA'];
+const $=id=>document.getElementById(id);
+const brl=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+const estado={produtos:[],byCode:new Map(),lancamentos:[],card:'VENCIDOS',usuarios:{},usuario:null,fila:[],salvando:false,carregando:false};
+
+function status(msg){$('statusBase').textContent=msg}
+function todayISO(){let d=new Date();return d.toISOString().slice(0,10)}
+function n(v){let x=Number(v||0);return isFinite(x)?x:0}
+function norm(s){return String(s||'').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ')}
+function esc(s){return String(s==null?'':s).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c))}
+function callGS(params,cb,timeout){
+  timeout=timeout||90000;
+  let callbackName='cb_'+Date.now()+'_'+Math.floor(Math.random()*99999);
+  params.callback=callbackName;
+  params._=Date.now();
+  let qs=Object.keys(params).map(k=>encodeURIComponent(k)+'='+encodeURIComponent(params[k])).join('&');
+  let script=document.createElement('script');
+  let done=false;
+  let timer=setTimeout(()=>{if(done)return;done=true;try{delete window[callbackName];script.remove()}catch(e){}cb({ok:false,erro:'Tempo esgotado ao conectar ao Apps Script'});},timeout);
+  window[callbackName]=resp=>{if(done)return;done=true;clearTimeout(timer);try{delete window[callbackName];script.remove()}catch(e){}cb(resp)};
+  script.onerror=()=>{if(done)return;done=true;clearTimeout(timer);try{delete window[callbackName];script.remove()}catch(e){}cb({ok:false,erro:'Falha ao conectar ao Apps Script'});};
+  script.src=APPS_SCRIPT_URL+'?'+qs;
+  document.head.appendChild(script);
+}
+function sessaoSalvar(){localStorage.setItem('sessaoPainelNovoV1',JSON.stringify(estado.usuario||null))}
+function sessaoCarregar(){try{estado.usuario=JSON.parse(localStorage.getItem('sessaoPainelNovoV1')||'null')}catch(e){estado.usuario=null}atualizarLoginUI()}
+function isAdmin(){return estado.usuario&&norm(estado.usuario.perfil)==='ADMIN'}
+function exigirLogin(){if(!estado.usuario){abrirLogin();return false}return true}
+function exigirAdmin(cb){if(!exigirLogin())return;if(!isAdmin()){alert('Ação permitida somente para administrador.');return}cb(estado.usuario.senha)}
+function atualizarLoginUI(){let btn=$('btnLogin'),st=$('loginStatus');if(estado.usuario){btn.textContent='Sair';btn.className='btn-danger';st.textContent='Logado: '+estado.usuario.usuario+' ('+estado.usuario.perfil+')'}else{btn.textContent='Login';btn.className='btn-light';st.textContent='Não logado'}}
+function abrirLogin(){$('modalLogin').classList.add('open');$('loginErro').style.display='none';setTimeout(()=>$('loginUsuario').focus(),60)}
+function fecharLogin(){$('modalLogin').classList.remove('open')}
+function validarLogin(){let u=String($('loginUsuario').value||'').trim().toLowerCase(),s=String($('loginSenha').value||'');let cad=estado.usuarios[u];if(cad&&cad.ativo!==false&&String(cad.senha)===s){estado.usuario={usuario:u,senha:cad.senha,perfil:cad.perfil||'USUARIO',nome:cad.nome||u};sessaoSalvar();atualizarLoginUI();fecharLogin();$('loginSenha').value='';status('Login realizado: '+u)}else{$('loginErro').style.display='block';$('loginSenha').value='';$('loginSenha').focus()}}
+function carregarUsuarios(cb){callGS({action:'listarUsuariosPainel'},r=>{if(r&&r.ok){estado.usuarios={};(r.dados||[]).forEach(x=>estado.usuarios[String(x.usuario||'').toLowerCase()]=x)}cb&&cb(r)})}
+function carregarTudo(){
+  if(estado.carregando)return;
+  estado.carregando=true;status('Carregando base e lançamentos do Google Sheets...');
+  callGS({action:'base'},base=>{
+    if(!base||!base.ok){estado.carregando=false;status('Erro ao carregar base: '+((base&&base.erro)||'sem resposta'));return}
+    estado.produtos=base.dados||[];estado.byCode=new Map();estado.produtos.forEach(p=>estado.byCode.set(String(p.codigo||'').trim(),p));
+    callGS({action:'listarLancamentos'},lan=>{
+      estado.carregando=false;
+      if(!lan||!lan.ok){status('Erro ao carregar lançamentos: '+((lan&&lan.erro)||'sem resposta'));return}
+      estado.lancamentos=lan.dados||[];
+      renderTudo();status('Base carregada. Produtos: '+estado.produtos.length+' | Lançamentos: '+estado.lancamentos.length);
+    });
+  });
+}
+function periodoOk(x){let di=$('dataInicial').value,df=$('dataFinal').value,d=String(x.data||'').slice(0,10);if(di&&d<di)return false;if(df&&d>df)return false;return true}
+function lancamentosPeriodo(){return estado.lancamentos.filter(periodoOk)}
+function lancamentosCard(card){return lancamentosPeriodo().filter(x=>norm(x.destino)===norm(card))}
+function somaCard(card){let arr=lancamentosCard(card);return {itens:arr.length,qtd:arr.reduce((s,x)=>s+n(x.qtdTotal||x.qtdLoteVenda||x.qtdRecup||x.qtdLixo),0),valor:arr.reduce((s,x)=>s+n(x.valorTotal||x.vlrLoteAvaria||x.vlrRecuperado||x.vlrLixo),0)}}
+function renderCards(){let html='';DESTINOS.forEach(card=>{let s=somaCard(card);html+=`<div class="card ${norm(card)===norm(estado.card)?'ativo':''}" data-card="${esc(card)}"><div class="nome">${esc(card)}</div><div class="valor">${brl.format(s.valor)}</div><div class="meta">${s.itens} itens | Qtd ${s.qtd}</div></div>`});$('cards').innerHTML=html;document.querySelectorAll('.card').forEach(c=>c.onclick=()=>{estado.card=c.dataset.card;renderTudo()})}
+function headersCard(card){
+  if(card==='LOTE DE AVARIA')return ['CÓDIGO','DATA AVARIA','DESCRIÇÃO','FORNECEDOR','CUSTO','QTD.','VLR TOTAL','PALETE','ENDEREÇO','OBSERVAÇÃO','AÇÕES'];
+  if(card==='RECUPERADO')return ['CÓDIGO','DATA AVARIA','DESCRIÇÃO','FORNECEDOR','CUSTO','QTD.','VLR TOTAL','PALETE','ENDEREÇO','OBSERVAÇÃO','AÇÕES'];
+  return ['CÓDIGO','DATA AVARIA','DESCRIÇÃO','VALIDADE','FORNECEDOR','CUSTO REAL UNIT','QTDE.','VLR TOTAL','PALETE','ENDEREÇO','OBSERVAÇÃO','AÇÕES'];
+}
+function qtdLinha(x){return n(x.qtdTotal)||n(x.qtdLoteVenda)||n(x.qtdRecup)||n(x.qtdLixo)}
+function valorLinha(x){return n(x.valorTotal)||n(x.vlrLoteAvaria)||n(x.vlrRecuperado)||n(x.vlrLixo)}
+function renderTabela(){let card=estado.card;$('tableTitle').textContent=card||'Selecione um card';let ths=headersCard(card);$('thead').innerHTML='<tr>'+ths.map(h=>`<th>${esc(h)}</th>`).join('')+'</tr>';let arr=lancamentosCard(card);if(!arr.length){$('tbody').innerHTML=`<tr><td colspan="${ths.length}" class="empty">Nenhum lançamento encontrado para ${esc(card)}.</td></tr>`;return}
+  $('tbody').innerHTML=arr.map(x=>`<tr>
+    <td class="center" title="${esc(x.codigo)}">${esc(x.codigo)}</td>
+    <td class="center">${esc(formatData(x.data))}</td>
+    <td title="${esc(x.descricao)}">${esc(x.descricao)}</td>
+    ${card!=='LOTE DE AVARIA'&&card!=='RECUPERADO'?`<td class="center">${esc(formatData(x.validade))}</td>`:''}
+    <td title="${esc(x.fornecedor)}">${esc(x.fornecedor)}</td>
+    <td class="num">${brl.format(n(x.custo))}</td>
+    <td class="center">${qtdLinha(x)}</td>
+    <td class="num">${brl.format(valorLinha(x))}</td>
+    <td class="center">${esc(x.palete)}</td>
+    <td class="center">${esc(x.endereco)}</td>
+    <td title="${esc(x.observacao)}">${esc(x.observacao)}</td>
+    <td class="center"><button class="btn-small btn-light" data-edit="${esc(x.id)}">Editar</button> <button class="btn-small btn-danger" data-del="${esc(x.id)}">Excluir</button></td>
+  </tr>`).join('');
+  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>excluirLancamento(b.dataset.del));
+}
+function formatData(d){if(!d)return'';let s=String(d);if(/^\d{4}-\d{2}-\d{2}/.test(s)){let p=s.slice(0,10).split('-');return p[2]+'/'+p[1]+'/'+p[0]}return s}
+function renderTudo(){renderCards();renderTabela();renderPeriodo();renderFila()}
+function renderPeriodo(){let di=$('dataInicial').value,df=$('dataFinal').value;$('periodoResumo').textContent=di||df?'Período: '+(di?formatData(di):'início')+' até '+(df?formatData(df):'fim'):'Período: Todos'}
+function criarDestinosForm(){$('destinosForm').innerHTML=DESTINOS_OPER.map(d=>`<label class="destinoCheck"><input type="checkbox" value="${esc(d)}"> ${esc(d)}</label>`).join('')}
+function buscarProduto(){let cod=String($('codigo').value||'').trim();let p=estado.byCode.get(cod);if(!p){$('descricao').value='ITEM NÃO ENCONTRADO';$('fornecedor').value='';$('valorVenda').value='';$('custo').value='';return false}$('descricao').value=p.descricao||'';$('fornecedor').value=p.fornecedor||'';$('valorVenda').value=n(p.valorVenda).toFixed(2);$('custo').value=n(p.custo).toFixed(2);calcular();return true}
+function calcular(){let venda=n($('valorVenda').value),custo=n($('custo').value),desc=n($('desconto').value),qt=n($('qtdTotal').value),ql=n($('qtdLote').value),qr=n($('qtdRecup').value),qx=n($('qtdLixo').value);$('precoAvaria').value=(venda*(1-desc)).toFixed(2);$('valorTotal').value=(custo*(ql+qr+qx||qt)).toFixed(2);$('vlrLote').value=(custo*ql).toFixed(2);$('vlrRecup').value=(custo*qr).toFixed(2);$('vlrLixo').value=(custo*qx).toFixed(2);$('vlrPerda').value=(custo*qx).toFixed(2)}
+function destinosSelecionados(){return Array.from(document.querySelectorAll('#destinosForm input:checked')).map(x=>x.value)}
+function validarForm(ds){if(!String($('codigo').value).trim())return alert('Informe o código.'),false;if(!buscarProduto())return alert('Código não encontrado na base.'),false;if(!ds.length)return alert('Selecione pelo menos um destino/card.'),false;if(!n($('qtdTotal').value)&&!n($('qtdLote').value)&&!n($('qtdRecup').value)&&!n($('qtdLixo').value))return alert('Informe quantidade.'),false;if(!String($('palete').value).trim())return alert('Informe o palete.'),false;return true}
+function itemBase(){return {codigo:$('codigo').value,descricao:$('descricao').value,fornecedor:$('fornecedor').value,valorVenda:n($('valorVenda').value),custo:n($('custo').value),qtdTotal:n($('qtdTotal').value),qtdLoteVenda:n($('qtdLote').value),qtdRecup:n($('qtdRecup').value),qtdLixo:n($('qtdLixo').value),estado:$('estado').value,desconto:n($('desconto').value),endereco:$('endereco').value,data:$('data').value||todayISO(),palete:$('palete').value,turno:$('turno').value,motAvaria:$('motAvaria').value,motPerda:$('motPerda').value,validade:$('validade').value,motDevolucao:$('motDevolucao').value,motTroca:$('motTroca').value,observacao:$('observacao').value,precoAvaria:n($('precoAvaria').value),valorTotal:n($('valorTotal').value),vlrLoteAvaria:n($('vlrLote').value),vlrRecuperado:n($('vlrRecup').value),vlrLixo:n($('vlrLixo').value)}}
+function adicionarLista(ev){ev&&ev.preventDefault();if(!exigirLogin())return;calcular();let ds=destinosSelecionados();if(!validarForm(ds))return;let base=itemBase();ds.forEach(destino=>estado.fila.push(Object.assign({},base,{destino:destino,endereco:destino==='RECUPERADO'?'PICKING':base.endereco})));salvarFilaLocal();limparForm();renderFila();status('Lançamento adicionado à lista. Tela pronta para novo lançamento. Pendentes: '+estado.fila.length)}
+function salvarFilaLocal(){localStorage.setItem('filaNovoV1',JSON.stringify(estado.fila))}
+function carregarFilaLocal(){try{estado.fila=JSON.parse(localStorage.getItem('filaNovoV1')||'[]')}catch(e){estado.fila=[]}}
+function renderFila(){let tit=$('tituloFila'),body=$('bodyFila');tit.textContent='Itens digitados / aguardando salvamento - '+estado.fila.length+' lançamento(s)';if(!estado.fila.length){body.innerHTML='<div class="empty">Nenhum lançamento na lista.</div>';return}body.innerHTML='<table><thead><tr><th style="width:44px">#</th><th style="width:80px">Código</th><th>Descrição</th><th style="width:130px">Destino</th><th style="width:70px">Qtd</th><th style="width:80px">Palete</th><th style="width:95px">Total</th><th style="width:90px">Ação</th></tr></thead><tbody>'+estado.fila.map((x,i)=>`<tr><td class="center">${i+1}</td><td class="center">${esc(x.codigo)}</td><td>${esc(x.descricao)}</td><td>${esc(x.destino)}</td><td class="center">${qtdLinha(x)}</td><td class="center">${esc(x.palete)}</td><td class="num">${brl.format(valorLinha(x))}</td><td class="center"><button class="btn-small btn-danger" data-rm="${i}">Remover</button></td></tr>`).join('')+'</tbody></table>';document.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{estado.fila.splice(Number(b.dataset.rm),1);salvarFilaLocal();renderFila()})}
+function limparForm(){['codigo','descricao','fornecedor','valorVenda','custo','qtdTotal','qtdLote','qtdRecup','qtdLixo','vlrPerda','precoAvaria','valorTotal','vlrLote','vlrRecup','vlrLixo','palete','turno','motAvaria','motPerda','validade','motDevolucao','motTroca','observacao'].forEach(id=>$(id).value='');$('endereco').value='';$('estado').value='A';$('desconto').value='0.30';$('data').value=todayISO();document.querySelectorAll('#destinosForm input').forEach(c=>c.checked=false);setTimeout(()=>$('codigo').focus(),80)}
+function salvarLista(){if(estado.salvando)return alert('A lista já está sendo salva. Aguarde.');if(!estado.fila.length)return alert('Nenhum lançamento pendente para salvar.');if(!confirm('Salvar '+estado.fila.length+' lançamento(s) no Google Sheets agora?'))return;estado.salvando=true;$('btnSalvarFila').disabled=true;status('Salvando lista no Google Sheets...');callGS({action:'salvarLancamentos',payload:JSON.stringify(estado.fila)},r=>{estado.salvando=false;$('btnSalvarFila').disabled=false;if(r&&r.ok){let salvos=r.salvos||estado.fila.length;estado.fila=[];salvarFilaLocal();renderFila();limparForm();status('Lista salva com sucesso. Salvos: '+salvos+'. Clique em Atualizar base para conferir na tabela.')}else{alert('Erro ao salvar lista: '+((r&&r.erro)||'sem resposta'));status('Erro ao salvar. Lista mantida para evitar perda/duplicidade.')}})}
+function excluirLancamento(id){exigirAdmin(senha=>{if(!confirm('Excluir este lançamento?'))return;status('Excluindo lançamento...');callGS({action:'excluirLancamento',id:id,senha:senha},r=>{if(r&&r.ok){estado.lancamentos=estado.lancamentos.filter(x=>String(x.id)!==String(id));renderTudo();status('Lançamento excluído.')}else alert('Erro ao excluir: '+((r&&r.erro)||'sem resposta'))})})}
+function limparCard(){let card=estado.card;if(!card||!DESTINOS_OPER.includes(card))return alert('Selecione um card operacional para limpar.');exigirAdmin(senha=>{if(!confirm('ATENÇÃO: serão apagados definitivamente os lançamentos do card '+card+'. Deseja continuar?'))return;let c=prompt('Para confirmar, digite LIMPAR');if(norm(c)!=='LIMPAR')return alert('Confirmação cancelada.');status('Limpando card '+card+' no Google Sheets...');callGS({action:'limparCard',card:card,senha:senha,confirmacao:'LIMPAR'},r=>{if(r&&r.ok){estado.lancamentos=estado.lancamentos.filter(x=>norm(x.destino)!==norm(card));renderTudo();alert('Limpeza concluída. Card '+card+' | Linhas removidas: '+(r.removidos||0));status('Card '+card+' limpo na tela. Removidos no Google Sheets: '+(r.removidos||0));}else alert('Erro ao limpar card: '+((r&&r.erro)||'sem resposta'))})})}
+function excluirPalete(){let card=estado.card;if(!DESTINOS_OPER.includes(card))return alert('Selecione um card operacional.');exigirAdmin(senha=>{let entrada=prompt('Digite um ou mais PALETES para excluir. Separe por vírgula, espaço ou linha.');if(!entrada)return;let paletes=[...new Set(String(entrada).split(/[\n,;\t ]+/).map(x=>x.trim()).filter(Boolean))];let achados=estado.lancamentos.filter(x=>norm(x.destino)===norm(card)&&paletes.includes(String(x.palete||'').trim()));if(!achados.length)return alert('Nenhum lançamento encontrado para estes paletes no card '+card+'.');let conf=prompt('Serão excluídos '+achados.length+' lançamentos. Para confirmar, digite EXCLUIR');if(norm(conf)!=='EXCLUIR')return;let ids=achados.map(x=>x.id),ok=0,erros=0;function prox(i){if(i>=ids.length){estado.lancamentos=estado.lancamentos.filter(x=>!ids.includes(x.id));renderTudo();status('Exclusão por palete concluída. Removidos: '+ok+' | Erros: '+erros);alert('Concluído. Removidos: '+ok+' | Erros: '+erros);return}status('Excluindo palete... '+(i+1)+'/'+ids.length);callGS({action:'excluirLancamento',id:ids[i],senha:senha},r=>{if(r&&r.ok)ok++;else erros++;prox(i+1)})}prox(0)})}
+function diagnosticarCard(){let card=estado.card;status('Diagnosticando card '+card+'...');callGS({action:'diagnosticarCard',card:card},r=>{if(r&&r.ok){alert('Diagnóstico '+card+'\nTotal lançamentos: '+r.totalLancamentos+'\nEncontrados no card: '+r.encontradosCard);status('Diagnóstico concluído. Encontrados no card '+card+': '+r.encontradosCard)}else alert('Erro no diagnóstico: '+((r&&r.erro)||'sem resposta'))})}
+function init(){
+  $('data').value=todayISO();criarDestinosForm();carregarFilaLocal();sessaoCarregar();carregarUsuarios(()=>{});renderTudo();
+  $('btnToggleDigitacao').onclick=()=>$('painelDigitacao').classList.toggle('open');$('btnOcultarDigitacao').onclick=()=>$('painelDigitacao').classList.remove('open');
+  $('btnAtualizar').onclick=carregarTudo;$('btnTema').onclick=()=>document.body.classList.toggle('temaClaro');$('btnAdmin').onclick=()=>$('menuAdmin').classList.toggle('open');document.addEventListener('click',e=>{if(!e.target.closest('#menuAdmin'))$('menuAdmin').classList.remove('open')});
+  $('btnLogin').onclick=()=>{if(estado.usuario){estado.usuario=null;localStorage.removeItem('sessaoPainelNovoV1');atualizarLoginUI();status('Sessão encerrada.')}else abrirLogin()};$('loginOk').onclick=validarLogin;$('loginCancelar').onclick=fecharLogin;$('loginUsuario').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginSenha').focus()});$('loginSenha').addEventListener('keydown',e=>{if(e.key==='Enter')validarLogin()});
+  $('btnBuscar').onclick=buscarProduto;$('codigo').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();buscarProduto();$('qtdTotal').focus()}});['qtdTotal','qtdLote','qtdRecup','qtdLixo','desconto','custo','valorVenda'].forEach(id=>$(id).addEventListener('input',calcular));
+  $('formAvaria').addEventListener('submit',adicionarLista);$('btnLimparForm').onclick=limparForm;$('btnSalvarFila').onclick=salvarLista;$('btnLimparFila').onclick=()=>{if(estado.fila.length&&confirm('Limpar lista pendente?')){estado.fila=[];salvarFilaLocal();renderFila();status('Lista pendente limpa.')}};
+  $('btnLimparCard').onclick=limparCard;$('btnExcluirPalete').onclick=excluirPalete;$('btnDiagnosticar').onclick=diagnosticarCard;
+  $('dataInicial').onchange=renderTudo;$('dataFinal').onchange=renderTudo;$('btnLimparPeriodo').onclick=()=>{$('dataInicial').value='';$('dataFinal').value='';renderTudo()};
+}
+document.addEventListener('DOMContentLoaded',init);
+})();
+</script>
+</body>
+</html>
